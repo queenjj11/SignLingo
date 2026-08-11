@@ -1,4 +1,4 @@
-# 🤟 SignLingo
+# SignLingo
 ### Real-Time Multilingual Sign Language Translator (ASL • BSL • ISL)
 
 SignLingo is an AI-powered sign language recognition system that translates hand gestures into **text and speech** in real time using computer vision and machine learning.
@@ -96,7 +96,7 @@ Unified Landmark Dataset
 
 ---
 
-# 🧠 Model Architecture
+# Model Architecture
 
 ### Letter Recognition
 
@@ -179,9 +179,3 @@ streamlit run app/app_webrtc.py
 - TensorFlow Lite deployment
 - Additional sign language support
 - Cloud deployment
-
----
-
-# 📜 License
-
-This project is released under the MIT License.

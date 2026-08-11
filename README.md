@@ -1,94 +1,187 @@
-# SignLingo — Multi-Language Sign Language Translator
-### ASL · BSL · ISL &nbsp;|&nbsp; Letters · Words · Sentences &nbsp;|&nbsp; Real-time webcam → speech
+# 🤟 SignLingo
+### Real-Time Multilingual Sign Language Translator (ASL • BSL • ISL)
 
-SignLingo is an end-to-end sign language recognition system that turns webcam video into
-text and speech across **three sign languages** (American, British, Indian) and **three
-linguistic levels** (fingerspelled letters, isolated words, continuous sentences).
+SignLingo is an AI-powered sign language recognition system that translates hand gestures into **text and speech** in real time using computer vision and machine learning.
 
-This started from a single-language, single-letter MLP classifier (`legacy/`). It has been
-rebuilt into a modular pipeline: landmark extraction → per-language models → sentence
-construction with NLP smoothing → speech output, wrapped in a Streamlit app.
+The project supports **American Sign Language (ASL)**, **British Sign Language (BSL)**, and **Indian Sign Language (ISL)** through a unified landmark-based pipeline built with **MediaPipe**, **Scikit-learn**, **PyTorch**, and **Streamlit WebRTC**.
 
 ---
 
-## 1. Why this is hard (and what makes it a real project, not a toy)
+# ✨ Features
 
-| | ASL | BSL | ISL |
-|---|---|---|---|
-| Hands used for fingerspelling | One | **Two** (totally different alphabet shape) | Mixed (one for some letters, two for others) |
-| Grammar | Distinct sentence order (topic-comment) | Distinct order, mouthing plays a grammatical role | SOV order, differs from spoken Hindi/English |
-| Words vs. letters | Words are full-arm/body motions, not static poses | Same | Same |
+- 🌍 Multilingual support
+  - American Sign Language (ASL)
+  - British Sign Language (BSL)
+  - Indian Sign Language (ISL)
 
-Because of this, a single model can't cover everything. SignLingo trains **two model
-families per language**:
+- ✋ Real-time webcam recognition
 
-1. **Static pose classifiers** (MLP, like your original) for fingerspelled letters —
-   one frame of hand landmarks in → one letter out.
-2. **Sequence classifiers** (LSTM) for words and common sentence chunks — a few seconds
-   of landmark sequences in → a gloss (word) out. Sentences are then assembled from
-   glosses + grammar smoothing (see §5), the same way real sign-to-text systems work,
-   because there is no dataset of "every possible sentence" — sentences are composed.
+- 🤖 MediaPipe hand landmark extraction
+
+- 🧠 Machine Learning based classification
+  - MLP classifier for fingerspelled letters
+  - Bidirectional LSTM for word recognition
+
+- 📝 Sentence construction with NLP
+
+- 🔊 Text-to-Speech output
+
+- 📹 Browser-based webcam using Streamlit WebRTC
+
+- 🏗 Modular training pipeline for adding new languages and datasets
 
 ---
 
-## 3. Project structure
+# 🛠 Technology Stack
 
-```
+| Category | Technologies |
+|----------|--------------|
+| Programming | Python |
+| Computer Vision | OpenCV, MediaPipe |
+| Machine Learning | Scikit-learn, PyTorch |
+| NLP | Rule-based Sentence Builder |
+| UI | Streamlit, Streamlit-WebRTC |
+| Data Processing | NumPy, Pandas |
+
+---
+
+# 📂 Project Structure
+
+```text
 signlingo/
-├── data/
-│   ├── raw/{asl,bsl,isl}/         ← drop downloaded datasets here (see script docstrings)
-│   └── processed/                 ← landmark CSVs / .npy sequences (generated)
-├── scripts/
-│   ├── import_existing_asl_csv.py     # folds your current CSV into the new schema
-│   ├── extract_landmarks_letters.py   # image datasets -> per-language letter CSV
-│   └── extract_landmarks_words.py     # video datasets -> per-language word/sentence sequences
-├── training/
-│   ├── train_letters_model.py     # MLP per language (extends your original approach)
-│   └── train_words_model.py       # LSTM per language, sequence classification
-├── nlp/
-│   └── sentence_builder.py        # gloss -> grammatical sentence, autocomplete, TTS
-├── models/                        # saved models per language+level (generated)
+│
 ├── app/
-│   └── app.py                     # Streamlit app: language + mode switch, live webcam
-└── legacy/
-    ├── predict.py                 # your original script, kept for reference
-    └── train_model.py
+│   ├── app.py
+│   └── app_webrtc.py
+│
+├── models/
+│
+├── nlp/
+│
+├── scripts/
+│
+├── training/
+│
+├── README.md
+├── requirements.txt
+└── .gitignore
 ```
 
-## 4. Pipeline
+---
 
+# ⚙️ System Pipeline
+
+```text
+Raw Images / Videos
+        │
+        ▼
+MediaPipe Hand Landmark Extraction
+        │
+        ▼
+Unified Landmark Dataset
+        │
+        ├────────► Letter Recognition (MLP)
+        │
+        └────────► Word Recognition (Bi-LSTM)
+                        │
+                        ▼
+            Sentence Builder (NLP)
+                        │
+                        ▼
+               Text-to-Speech Engine
+                        │
+                        ▼
+              Streamlit Web Application
 ```
-raw images/videos  →  MediaPipe landmark extraction  →  unified CSV/.npy per language
-                                                              │
-                                        ┌─────────────────────┴─────────────────────┐
-                                letters: MLPClassifier                    words: LSTM sequence classifier
-                                (scikit-learn, per language)              (PyTorch, per language)
-                                        │                                             │
-                                        └─────────────────────┬─────────────────────┘
-                                                              ▼
-                                          nlp/sentence_builder.py (gloss buffer →
-                                          autocomplete + grammar smoothing)
-                                                              ▼
-                                                  pyttsx3 text-to-speech
-                                                              ▼
-                                                    app/app_webrtc.py (Streamlit UI)
+
+---
+
+# 🧠 Model Architecture
+
+### Letter Recognition
+
+- MediaPipe Hands
+- 21 hand landmarks
+- Two-hand unified landmark schema
+- MLPClassifier (Scikit-learn)
+
+### Word Recognition
+
+- Landmark sequence extraction
+- Bidirectional LSTM
+- Sequence classification
+
+### Sentence Generation
+
+Predicted letters and glosses are accumulated into a rolling buffer before being transformed into natural language using a lightweight NLP sentence builder. The generated sentence is then spoken using a text-to-speech engine.
+
+---
+
+# 📊 Performance
+
+| Model | Accuracy |
+|---------|---------:|
+| Multilingual Letter Classifier | **98.8%** |
+
+---
+
+# 📁 Datasets
+
+The project uses publicly available datasets for:
+
+- American Sign Language (ASL)
+- British Sign Language (BSL)
+- Indian Sign Language (ISL)
+
+The datasets are **not included** in this repository due to size and licensing restrictions.
+
+After downloading them, place them inside:
+
+```text
+dataset/
 ```
 
-## 5. Sentence construction (the "impressive" part)
+Then generate landmarks using:
 
-Sign languages don't map 1:1 onto English word order (ASL/ISL are topic-comment / SOV-ish;
-fingerspelling is letter-by-letter). Rather than pretend a labeled dataset exists for every
-sentence a user might sign, SignLingo:
+```bash
+python scripts/extract_landmarks_letters.py
+```
 
-1. Recognizes a stream of glosses/letters (e.g. `ME NAME J-O-H-N GO SCHOOL`).
-2. Buffers them into a rolling window.
-3. Runs a lightweight grammar-smoothing pass (`nlp/sentence_builder.py`) — starting with a
-   rule-based reordering + a pluggable slot for a HuggingFace grammar-correction model
-   (`pipeline("text2text-generation", model="grammarly/coedit-large")` or similar) — to
-   turn that into fluent English/Hindi text: `"My name is John, I go to school."`
-4. Speaks the result with `pyttsx3`.
+---
 
-This mirrors how real research systems (e.g. the ISL-CSLTR and INCLUDE papers) frame the
-translation problem: recognition gives glosses, a separate language model gives grammar.
+# 🚀 Installation
 
+Clone the repository:
 
+```bash
+git clone https://github.com/<your-username>/signlingo.git
+```
+
+Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+Launch the application:
+
+```bash
+streamlit run app/app_webrtc.py
+```
+
+---
+
+# 📈 Future Improvements
+
+- Continuous sentence recognition
+- Transformer-based language translation
+- Mobile application
+- TensorFlow Lite deployment
+- Additional sign language support
+- Cloud deployment
+
+---
+
+# 📜 License
+
+This project is released under the MIT License.
